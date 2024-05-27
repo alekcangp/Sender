@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css">
+    <title>Sender</title>
+  </head>
+  <body>
+    Network: Cayene
+    <a href="https://developer.litprotocol.com/v3/resources/supported-chains">Supported chains</a>
+    <h3>Create, programm and send transactions using <a href="https://developer.litprotocol.com/v2/litactions/intro">Lit Action</a></h3>
+
+     <a href="https://faucet.litprotocol.com/">Lit faucet</a>
+    </br>
+     Create <a href="https://developer.litprotocol.com/learninglab/intro-to-lit/prog-signing#programmable-key-pairs">PKP</a>
+     <br>
+     Deposit PKP address
+     <br>
+     Past a transaction obects separated by commas. For example, to send Eth to different addresses on different network: {"chain":"chronicleTestnet", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"sepolia", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.01"}
+        <br>
+        Hit button 'Combine&Send'
+        <br><br>
+         Transactions:<br>
+          <textarea rows="4" cols="50" title="Array of objects" id="txs"></textarea>
+    
+     
+
+     
+     <br>
+     <br>
+    <button id="myButton">Combine&Send</button>
+    <script src="./index.js"></script>
+  </body>
+</html>

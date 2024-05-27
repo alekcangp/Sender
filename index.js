@@ -1,5 +1,5 @@
 import { LitNodeClient } from "@lit-protocol/lit-node-client";
-import { LitNetwork } from "@lit-protocol/constants";
+import { LitNetwork, LIT_CHAINS} from "@lit-protocol/constants";
 import {
   createSiweMessageWithRecaps,
   generateAuthSig,
@@ -28,30 +28,62 @@ async function buttonClick() {
     const account = await ethersSigner.getAddress();
     console.log("Connected account:", account);
 
+    const litProvider = new ethers.providers.JsonRpcProvider(LIT_CHAINS['chronicleTestnet']);
+
+/*
+    //api
+    //https://lit-protocol.calderaexplorer.xyz/api?module=account&action=balance&address=0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04
+   // https://lit-protocol.calderaexplorer.xyz/api?module=account&action=tokenList&address=0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04
+   // https://lit-protocol.calderaexplorer.xyz/api?module=account&action=tokentx&address=0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04&contractaddress=0x58582b93d978f30b4c4e812a16a7b31c035a69f7
+https://explorer.litprotocol.com/api/get-pkps-by-address/0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04?network=cayenne
+
+// ==================== LitContracts Setup ====================
+const contractClient = new LitContracts({
+  provider: litProvider,
+});
+await contractClient.connect();
+
+// ==================== Test Logic ====================
+const pkpAddress = await contractClient.pkpNftContract.read.getEthAddress('32083458941883779049872669842691641969632420515028376542249852682112709916075');
+console.log(pkpAddress);
+
+address: ethers.utils.computeAddress(publicKey),
+const pkpPubkey = await contractClient.pkpNftContract.read.getPubkey('32083458941883779049872669842691641969632420515028376542249852682112709916075');
+console.log(pkpPubkey);
+return
+*/
     const litNodeClient = await getLitNodeClient();
 
     const sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
     console.log("Got Session Signatures!");
 
 
-    const litProvider = new ethers.providers.JsonRpcProvider(
-      "https://chain-rpc.litprotocol.com/http",
-    );
-    const nonce = await litProvider.getTransactionCount('0x399bDD5604474D256598667b1D519f53798a8BeA');
+// run sender
+    const txs = document.getElementById('txs').value.split(',');
+    console.log(txs);
+
+    for (var i = 0; i < txs.lenght; ++i) {
+
+    const chainId = LIT_CHAINS[txs[i].chain].chainId;
+    const rpc = LIT_CHAINS[txs[i].chain].rpcUrls[0];
+    const workProvider = new ethers.providers.JsonRpcProvider(rpc);
+    const gasPrice = workProvider.getGasPrice();
+    console.log(gasPrice);
+    const pkpAddress = ethers.utils.computeAddress(publicKey);
+    const nonce = await workProvider.getTransactionCount(pkpAddress);
 
     const txParams = {
       nonce: nonce,
-      gasPrice: "0x0f4240", //
-      gasLimit: "0x" + (30000).toString(16),
-      to: account,
-      value: "0x" + (1).toString(16),
-      chainId: 175177,
+      gasPrice: gasPrice,//"0x0f4240", //
+      gasLimit: ethers.utils.parseUnits("21000","wei"),
+      to: txs.address,
+      value: ethers.utils.parseUnits(txs.value,"ether"),
+      chainId: chainId,
     };
 
     console.log(txParams);
 
-    const serializedTx = ethers.utils.serializeTransaction(txParams);
-    const rlpEncodedTxn = ethers.utils.arrayify(serializedTx);
+    const rlpEncodedTxn = ethers.utils.arrayify(ethers.utils.serializeTransaction(txParams));
 
 //Sign Tx within a lit action
 
@@ -67,12 +99,14 @@ async function buttonClick() {
       },
     });
     console.log("litActionSignatures: ", litActionSignatures);
-
+return
     //Send Tx
 
    const signedTx = ethers.utils.serializeTransaction(txParams, litActionSignatures.signatures.sig.signature);
    const tx = await litProvider.sendTransaction(signedTx);
    console.log(tx.hash); 
+
+  }
   
     //verifySignature(litActionSignatures.signatures.sig);
   } catch (error) {
