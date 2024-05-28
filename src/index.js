@@ -60,11 +60,10 @@ async function buttonClick() {
     document.getElementById('bal').innerHTML = `${balanceInLit} Lit`;
 
    const nfts = await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`);
+
  
-  // console.log("fvsdv",nfts.data.data[0])
-   if (nfts.data.data[0] != "") {
-    const tokenId = nfts.data.data[0].tokenID;
-const litProvider = new ethers.providers.JsonRpcProvider(LIT_CHAINS['chronicleTestnet']);
+const tokenId = nfts.data.data[0].tokenID;
+//const litProvider = new ethers.providers.JsonRpcProvider(LIT_CHAINS['chronicleTestnet']);
 const contractClient = new LitContracts({
   network: LitNetwork.Cayenne,
 });
@@ -75,10 +74,10 @@ const pkpPubkey = await contractClient.pkpNftContract.read.getPubkey(tokenId);
 const pkpAddress = ethers.utils.computeAddress(pkpPubkey);
 document.getElementById('pkpaddr').innerHTML = pkpAddress;
     
-   } else { 
+  
     pkpPubkey = await mintPkp(ethersSigner);
 
-   } 
+  
    
 
 
