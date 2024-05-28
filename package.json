@@ -1,11 +1,11 @@
 {
-  "name": "Sender",
+  "name": "sender",
   "version": "0.1.0",
   "description": "Example of combining and sending transactions using a Lit Action",
-  "source": "src/index.html",
+  "source": "index.html",
   "license": "MIT",
   "scripts": {
-    "start": "parcel ./src/index.html"
+    "start": "parcel index.html"
   },
   "dependencies": {
     "@lit-protocol/auth-browser": "^6.0.0-beta.4",
@@ -14,7 +14,7 @@
     "@lit-protocol/contracts-sdk": "^6.0.0-beta.4",
     "@lit-protocol/lit-auth-client": "^6.0.0-beta.4",
     "@lit-protocol/lit-node-client": "^6.0.0-beta.4",
-    "ethers": "5.7.2",
+    "ethers": "5.7.2"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.5",

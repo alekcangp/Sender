@@ -11,6 +11,7 @@ import { disconnectWeb3 } from "@lit-protocol/auth-browser";
 import { LitContracts } from "@lit-protocol/contracts-sdk";
 import * as ethers from "ethers";
 import { litActionSign } from "./litAction";
+console.log(LIT_CHAINS['sepolia'])
 
 const PKP_PUBLIC_KEY = process.env.PKP_PUBLIC_KEY;
 
@@ -27,7 +28,6 @@ async function buttonClick() {
     const ethersSigner = provider.getSigner();
     const account = await ethersSigner.getAddress();
     console.log("Connected account:", account);
-
     const litProvider = new ethers.providers.JsonRpcProvider(LIT_CHAINS['chronicleTestnet']);
 
 /*
@@ -59,28 +59,29 @@ return
 
 
 // run sender
-    const txs = document.getElementById('txs').value.split(',');
-    console.log(txs);
+    const txs = [{"chain":"chronicleTestnet", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"chronicleTestnet", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000002"}]//document.getElementById('txs').value.split('},');
+    //console.log(txs);
 
-    for (var i = 0; i < txs.lenght; ++i) {
+   const publicKey = '0476553d5513495fc72e924fdb3bc82948cf7c8714b9743d11cd6a855f105c1fc514198051cd006bbea5e4d0179d11bac1cc4f3dc0d00ea0fbb101765918866bc9'
 
-    const chainId = LIT_CHAINS[txs[i].chain].chainId;
-    const rpc = LIT_CHAINS[txs[i].chain].rpcUrls[0];
-    const workProvider = new ethers.providers.JsonRpcProvider(rpc);
-    const gasPrice = workProvider.getGasPrice();
-    console.log(gasPrice);
-    const pkpAddress = ethers.utils.computeAddress(publicKey);
-    const nonce = await workProvider.getTransactionCount(pkpAddress);
+   for (let i = 0; i < txs.length; i++)  {
+//console.log(val);
+    const workChain = LIT_CHAINS[txs[i].chain];
+   // const rpc = LIT_CHAINS[txs[i].chain].rpcUrls[0];
+    const workProvider = new ethers.providers.JsonRpcProvider(workChain.rpcUrls[0]);
+   // const gasPrice = await workProvider.getGasPrice();
+   // const pkpAddress = ethers.utils.computeAddress(`0x${publicKey}`);
+   // const nonce = await workProvider.getTransactionCount(pkpAddress);
 
     const txParams = {
-      nonce: nonce,
-      gasPrice: gasPrice,//"0x0f4240", //
+      nonce: await workProvider.getTransactionCount( ethers.utils.computeAddress(`0x${publicKey}`)),
+      gasPrice: await workProvider.getGasPrice(),//"0x0f4240", //
       gasLimit: ethers.utils.parseUnits("21000","wei"),
-      to: txs.address,
-      value: ethers.utils.parseUnits(txs.value,"ether"),
-      chainId: chainId,
+      to: txs[i].address,
+      value: ethers.utils.parseUnits(txs[i].value,"ether"),
+      chainId: workChain.chainId,
     };
-
+  
     console.log(txParams);
 
     const rlpEncodedTxn = ethers.utils.arrayify(ethers.utils.serializeTransaction(txParams));
@@ -94,19 +95,19 @@ return
         dataToSign: ethers.utils.arrayify(
           ethers.utils.keccak256(rlpEncodedTxn)
         ),
-        publicKey: await getPkpPublicKey(ethersSigner),
-        sigName: "sig",
+        publicKey: publicKey,//await getPkpPublicKey(ethersSigner),
+        sigName: `sig${i}`,
       },
     });
     console.log("litActionSignatures: ", litActionSignatures);
-return
+
     //Send Tx
 
-   const signedTx = ethers.utils.serializeTransaction(txParams, litActionSignatures.signatures.sig.signature);
-   const tx = await litProvider.sendTransaction(signedTx);
-   console.log(tx.hash); 
+   const signedTx = ethers.utils.serializeTransaction(txParams, litActionSignatures.signatures[`sig${i}`].signature);
+   const tx = await workProvider.sendTransaction(signedTx);
+   console.log(workChain.blockExplorerUrls[0] + "tx/" + tx.hash); 
 
-  }
+    }
   
     //verifySignature(litActionSignatures.signatures.sig);
   } catch (error) {
