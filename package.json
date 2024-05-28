@@ -4,9 +4,9 @@
   "description": "Example of combining and sending transactions using a Lit Action",
   "source": "src/index.html",
   "license": "MIT",
-  "homepage": "https://alekcangp.github.io/Sender/",
 "scripts": {
-  "build": "parcel build src/*.html --public-url /Sender/"
+  "start": "parcel src/index.html",
+  "build": "parcel build src/index.html"
 },
   "dependencies": {
     "@lit-protocol/auth-browser": "^6.0.0-beta.4",
