@@ -5,8 +5,7 @@
   "source": "src/index.html",
   "license": "MIT",
 "scripts": {
-  "start": "parcel",
-  "build": "parcel build"
+  "start": "parcel"
 },
   "dependencies": {
     "@lit-protocol/auth-browser": "^6.0.0-beta.4",
