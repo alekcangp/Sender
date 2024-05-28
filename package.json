@@ -5,7 +5,8 @@
   "source": "src/index.html",
   "license": "MIT",
 "scripts": {
-  "start": "parcel"
+  "start": "parcel",
+  "build": "parcel build"
 },
   "dependencies": {
     "@lit-protocol/auth-browser": "^6.0.0-beta.4",
@@ -17,8 +18,8 @@
     "ethers": "5.7.2"
   },
   "devDependencies": {
-   
-    "parcel": "latest",
+    "parcel-bundler": "^1.12.5",
+    "parcel": "^2.8.3",
     "tslib": "^2.6.2"
   }
 }
