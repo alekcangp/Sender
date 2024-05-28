@@ -1,0 +1,14 @@
+body {
+    text-align: center;
+    padding: 50px;
+}
+
+#log {
+   background:black;
+   color:yellowgreen;
+}
+
+#pkpaddr, #acc, #bal {
+    
+    color: blueviolet
+}

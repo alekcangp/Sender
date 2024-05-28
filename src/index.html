@@ -4,30 +4,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
     <title>Sender</title>
   </head>
   <body>
-    Network: Cayene
+    Network: <span style="color:green">Cayene</span>
     <br>
     <a href="https://developer.litprotocol.com/v3/resources/supported-chains">Supported chains</a>
+    <br>
+    <a href="https://faucet.litprotocol.com/">Lit faucet</a>
     <h3>Create, programm and send transactions using <a href="https://developer.litprotocol.com/v2/litactions/intro">Lit Action</a></h3>
 
-     <a href="https://faucet.litprotocol.com/">Lit faucet</a>
-    </br>
-     Create <a href="https://developer.litprotocol.com/learninglab/intro-to-lit/prog-signing#programmable-key-pairs">PKP</a>
+    <!--
+    Create <a href="https://developer.litprotocol.com/learninglab/intro-to-lit/prog-signing#programmable-key-pairs">PKP</a>
      <br>
      Deposit PKP address
      <br>
      Past a transaction obects separated by commas. For example, to send Eth to different addresses on different network: {"chain":"chronicleTestnet", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"sepolia", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.01"}
         <br>
-        Hit button 'Combine&Send'
+        Hit button 'Combine&Send'-->
+        
+        Account: <span id="acc">...</span>
+        <br>
+       Balance: <span id="bal">...</span>
+      <br>
+      PKP Address: <span id="pkpaddr">...</span>
         <br><br>
          Transactions:<br>
-          <textarea rows="4" cols="50" title="Array of objects" id="txs"></textarea>
+          <textarea placeholder='For example:{"chain":"chronicleTestnet","address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"sepolia","address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.01"}' rows="8" cols="100" title="Past the transaction obects separated by commas." id="txs"></textarea>
      <br>
      <br>
     <button id="myButton">Combine&Send</button>
-    <script type="module" src="./index.js"></script>
+
+    <pre id="log"></pre>
+    <script src="./index.js"></script>
   </body>
 </html>
