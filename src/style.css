@@ -1,20 +1,26 @@
 body {
     text-align: center;
-    padding: 50px;
+    margin: 50px;
+    
 }
 
 #log {
    background:black;
-   color:yellowgreen;
-   padding:10px
+   color:aqua;
+   padding:10px;
+   overflow-x:hidden; 
 }
 
 
-#pkpaddr, #acc, #bal {
+#pkpaddr, #acc, #bal, #pkppub {
     
     color: blueviolet
 }
 
 textarea {
     width: 100%;
+}
+
+a {
+    color:Teal
 }

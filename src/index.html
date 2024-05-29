@@ -13,6 +13,8 @@
     <a href="https://developer.litprotocol.com/v3/resources/supported-chains">Supported chains</a>
     <br>
     <a href="https://faucet.litprotocol.com/">Lit faucet</a>
+    <br>
+    <a href="https://developer.litprotocol.com/v2/pkp/intro">What's PKP</a>
     <h3>Create, programm and send transactions using <a href="https://developer.litprotocol.com/v2/litactions/intro">Lit Action</a></h3>
 
     <!--
@@ -29,15 +31,17 @@
        Balance: <span id="bal">...</span>
       <br>
       PKP Address: <span id="pkpaddr">...</span>
-      <br> <br>
-      <button id="mintButton">Mint new PKP</button>
+      <br>
+      PKP Public Key: <span id="pkppub">...</span>
         <br><br>
-         Transactions:<br>
-          <textarea placeholder='For example:{"chain":"chronicleTestnet","address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"sepolia","address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.01"}' rows="8" title="Past the transaction obects separated by commas." id="txs"></textarea>
+         Transactions:<br><br>
+          <textarea placeholder='For example:{"chain":"chronicleTestnet","address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"chronicleTestnet","address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000002"}' rows="8" title="Past the transaction obects separated by commas." id="txs"></textarea>
      <br>
      <br>
-    <button id="startButton">Combine&Send</button>
-
+    <button id="startButton"><b>Combine&Send</b></button>
+    <br><br>
+Console:<br><br>
+<button id="mintButton">Mint new PKP</button> <button id="viewButton">View PKPs</button> <button id="idButton">PKP from</button><input type="text" id="id" required minlength="4" maxlength="100" size="50" placeholder="TokenID"/>
     <pre id="log"></pre>
     <script src="./index.js"></script>
   </body>
