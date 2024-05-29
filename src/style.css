@@ -6,9 +6,15 @@ body {
 #log {
    background:black;
    color:yellowgreen;
+   padding:10px
 }
+
 
 #pkpaddr, #acc, #bal {
     
     color: blueviolet
+}
+
+textarea {
+    width: 100%;
 }

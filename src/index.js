@@ -15,23 +15,20 @@ import * as ethers from "ethers";
 import { litActionSign } from "./litAction";
 import axios from 'axios';
 
-const PKP_PUBLIC_KEY = "";
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("myButton").addEventListener("click", buttonClick);
+  document.getElementById("startButton").addEventListener("click", startClick);
+});
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("mintButton").addEventListener("click", mintPkp);
 });
 
-var log ='';
-function logs(t){
-  log += t + '<br>';
-   document.getElementById('log').innerHTML = log;
-} 
+var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit;
 
-async function buttonClick() {
-  log = '';
-  try {
-  
-  logs("Starting...");
+connect()
+
+async function connect() {
+  logs("violet","Connecting...");
   const ch = LIT_CHAINS['chronicleTestnet'];
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
@@ -48,43 +45,35 @@ async function buttonClick() {
       }]
     });
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
-    const ethersSigner = provider.getSigner();
-    
+    ethersSigner = provider.getSigner();
     const account = await ethersSigner.getAddress();
-    logs("Connected account: " + account);
-    const balance = await provider.getBalance(account);
-    const balanceInLit = ethers.utils.formatEther(balance);
+    logs("greenyellow","Connected account: " + account);
     document.getElementById('acc').innerHTML = account;
-    document.getElementById('bal').innerHTML = `${balanceInLit} Lit`;
+    const balance = await provider.getBalance(account);
+    balanceInLit = ethers.utils.formatEther(balance);
+    document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
+    logs("greenyellow","Fetching PKP...")
+    litContractClient = await getLitContractClient(ethersSigner);
+    pkpPubkey = await getPkpPublicKey(account);
+    if (pkpPubkey != "") {
+    const pkpAddress = ethers.utils.computeAddress(pkpPubkey);
+    document.getElementById('pkpaddr').innerHTML = pkpAddress;
+    logs("green","Ready!")
+    } else {logs("green","Complete!")}
 
-   const nfts = await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`);
-
- 
-const tokenId = nfts.data.data[0].tokenID;
-//const litProvider = new ethers.providers.JsonRpcProvider(LIT_CHAINS['chronicleTestnet']);
-const contractClient = new LitContracts({
-  network: LitNetwork.Cayenne,
-});
-await contractClient.connect();
+}
+return
+//const litNodeClient = await getLitNodeClient();
 
 
-const pkpPubkey = await contractClient.pkpNftContract.read.getPubkey(tokenId);
-const pkpAddress = ethers.utils.computeAddress(pkpPubkey);
-document.getElementById('pkpaddr').innerHTML = pkpAddress;
-    
+
+
+async function startClick() {
+  log = "";
+  try {
   
-    pkpPubkey = await mintPkp(ethersSigner);
-
-  
-   
-
-
-
-
-   return
-    
 
     //api
     //https://lit-protocol.calderaexplorer.xyz/api?module=account&action=balance&address=0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04
@@ -107,15 +96,12 @@ const pkpPubkey = await contractClient.pkpNftContract.read.getPubkey('3208345894
 console.log(pkpPubkey);
 return
 */
-    const litNodeClient = await getLitNodeClient();
-
+   
     const sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
     logs("Got Session Signatures!");
 
-   const publikKey = await getPkpPublicKey(ethersSigner)
-   logs(publikKey)
+   
 
-return
 
 // run sender
     //const txs = [{"chain":"chronicleTestnet", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"chronicleTestnet", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000002"}]
@@ -175,6 +161,17 @@ return
   }
 }
 
+async function getLitContractClient(ethersSigner) {
+  const litContractClient = new LitContracts({
+    signer: ethersSigner,
+    network: LitNetwork.Cayenne,
+   });
+   //logs("Connecting litContractClient to network...");
+  await litContractClient.connect();
+
+  //logs("litContractClient connected!");
+  return litContractClient;
+}
 
 async function getLitNodeClient() {
   const litNodeClient = new LitNodeClient({
@@ -189,32 +186,28 @@ async function getLitNodeClient() {
 }
 
 async function getPkpPublicKey(ethersSigner) {
-  if (PKP_PUBLIC_KEY !== undefined && PKP_PUBLIC_KEY !== "")
-    return PKP_PUBLIC_KEY;
-
-  const pkp = await mintPkp(ethersSigner);
-  logs("Minted PKP!", pkp);
-  return pkp.publicKey;
+  const nfts = await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${ethersSigner}?network=cayenne`);
+  if (!nfts.data.data.length) { 
+   logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
+    if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
+   return ""
+  }
+  const tokenId = nfts.data.data[0].tokenID;
+  return await litContractClient.pkpNftContract.read.getPubkey(tokenId);
 }
 
-async function mintPkp(ethersSigner) {
-  logs("Minting new PKP...");
-  const litContracts = new LitContracts({
-    signer: ethersSigner,
-    network: LitNetwork.Cayenne,
-  });
-
-  await litContracts.connect();
-
-  return (await litContracts.pkpNftContractUtils.write.mint()).pkp;
-
+async function mintPkp() {
+  logs("greenyellow","Minting new PKP...");
+  await litContractClient.pkpNftContractUtils.write.mint();
+  logs("greenyellow","Waiting for transaction about 15 sec...")
+  setTimeout(connect, 15000);
 }
 
 async function getSessionSigs(litNodeClient, ethersSigner) {
-  logs("Getting Session Signatures...");
+  logs("greenyellow","Getting Session Signatures...");
   return litNodeClient.getSessionSigs({
     chain: "ethereum",
-    expiration: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2).toISOString(), // 24 hours
+    expiration: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // 24 hours
     resourceAbilityRequests: [
       {
         resource: new LitPKPResource("*"),
@@ -262,3 +255,8 @@ function verifySignature(signature) {
   const recoveredAddress = ethers.utils.recoverAddress(dataSigned, encodedSig);
   console.log("Recovered address from signature: ", recoveredAddress);
 }
+
+function logs(c,t){
+  log += `<span style='color:${c}'>${t}</span><br>`;
+   document.getElementById('log').innerHTML = log;
+} 
