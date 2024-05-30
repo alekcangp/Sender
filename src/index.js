@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("idButton").addEventListener("click", idPkp);
 });
 
-var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,nfts;
+var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,nfts,sessionSigs,litNodeClient;
 
 connect()
 
@@ -82,8 +82,8 @@ async function connect() {
 
 async function startClick() {
   log = "";
-  try {
-
+  
+try {
 
   
 
@@ -94,10 +94,12 @@ async function startClick() {
    // https://lit-protocol.calderaexplorer.xyz/api?module=account&action=tokentx&address=0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04&contractaddress=0x58582b93d978f30b4c4e812a16a7b31c035a69f7
 //https://explorer.litprotocol.com/api/get-pkps-by-address/0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04?network=cayenne
 
-   const litNodeClient = await getLitNodeClient();
+   if (!litNodeClient)  litNodeClient = await getLitNodeClient();
 
-    const sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
+   if (!sessionSigs) {
+    sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
     logs("violet","Got Session Signatures!");
+   }
 
    
 
@@ -109,6 +111,7 @@ async function startClick() {
    //const publicKey = '0476553d5513495fc72e924fdb3bc82948cf7c8714b9743d11cd6a855f105c1fc514198051cd006bbea5e4d0179d11bac1cc4f3dc0d00ea0fbb101765918866bc9'
 
    for (let i = 0; i < txs.length; i++)  {
+    try {
 logs("aqua",`Sending Tx ${i+1}...`)
     const workChain = LIT_CHAINS[txs[i].chain];
     console.log( workChain)
@@ -155,13 +158,17 @@ logs("aqua",`Sending Tx ${i+1}...`)
    const signedTx = ethers.utils.serializeTransaction(txParams, litActionSignatures.signatures[`sig${i}`].signature);
    const tx = await workProvider.sendTransaction(signedTx);
    logs("lime",`Success! TxHash ${i+1}: <a href="${workChain.blockExplorerUrls[0]}tx/${tx.hash}" target="_blank">${tx.hash}</a>`); 
-
+  } catch(e) {
+    console.error(e);
+    logs("red","Something went wrong."+e.message);
+    continue
+}
     }
   logs("lime","All complited!")
     //verifySignature(litActionSignatures.signatures.sig);
-  } catch (error) {
-    console.error(error);
-    logs("red","Something went wrong." + error)
+  } catch (e) {
+    console.error(e);
+   logs("red","Something went wrong."+e.message)
   } finally {
     disconnectWeb3();
   }
@@ -205,10 +212,16 @@ async function getPkpPublicKey(i,account,id) {
 
 
 async function mintPkp() {
+  try {
   logs("aqua","Minting new PKP...");
   await litContractClient.pkpNftContractUtils.write.mint();
   logs("aqua","Waiting for transaction about 15 sec...")
   setTimeout(connect, 15000);
+  }
+ catch (error) {
+  console.error(error);
+  logs("red",error.message)
+}
 }
 
 async function getSessionSigs(litNodeClient, ethersSigner) {
