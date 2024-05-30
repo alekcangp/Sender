@@ -164,8 +164,8 @@ logs("violet",`Sending Tx ${i+1}...`)
     continue
 }
     }
-  logs("lime","All complited!")
-    //verifySignature(litActionSignatures.signatures.sig);
+  logs("lime","Complited!")
+   
   } catch (e) {
     console.error(e);
    logs("red","Something went wrong."+e.message)
@@ -337,7 +337,7 @@ function refresh(newKey) {
 }
 
 async function scanPkp(le,account) {
-  const nfts = (await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`)).data.data;
+  const nfts = (await axios.get(`https://api.codetabs.com/v1/proxy?quest=https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`)).data.data;
   var ids = [];
   if (!nfts.length) { 
    logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
