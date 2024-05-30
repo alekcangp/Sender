@@ -34,6 +34,7 @@ var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,acc
 connect()
 
 async function connect() {
+  try{
   logs("violet","Connecting...");
   const ch = LIT_CHAINS['chronicleTestnet'];
     await window.ethereum.request({
@@ -41,10 +42,10 @@ async function connect() {
       params: [{
         chainId: `0x${ch.chainId.toString(16)}`,
         rpcUrls: ch.rpcUrls,
-        chainName: ch.chainName,
+        chainName: ch.name,
         nativeCurrency: {
           name: ch.symbol,
-          symbol: ch.symbol,
+          symbol: (ch.symbol == 'testLPX') ? 'LIT' : ch.symbol,
           decimals: ch.decimals
         },
         blockExplorerUrls: ch.blockExplorerUrls
@@ -70,6 +71,11 @@ async function connect() {
     document.getElementById('pkppub').innerHTML = pkpPubkey;
     logs("lime","Ready!")
     } else {logs("lime","Complited!")}
+
+  } catch (error) {
+    console.error(error);
+    logs("red",error.message)
+  }
 
 }
 
@@ -155,7 +161,7 @@ logs("aqua",`Sending Tx ${i+1}...`)
     //verifySignature(litActionSignatures.signatures.sig);
   } catch (error) {
     console.error(error);
-    //logs("red",error.error)
+    logs("red","Something went wrong." + error)
   } finally {
     disconnectWeb3();
   }
