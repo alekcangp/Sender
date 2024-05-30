@@ -14,7 +14,8 @@
     "@lit-protocol/contracts-sdk": "^6.0.0-beta.4",
     "@lit-protocol/lit-auth-client": "^6.0.0-beta.4",
     "@lit-protocol/lit-node-client": "^6.0.0-beta.4",
-    "ethers": "5.7.2"
+    "ethers": "5.7.2",
+    "axios": "^1.7.2"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.5",
