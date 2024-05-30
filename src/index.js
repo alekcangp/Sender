@@ -39,11 +39,11 @@ async function connect() {
       method: "wallet_addEthereumChain",
       params: [{
         chainId: `0x${ch.chainId.toString(16)}`,
-        rpcUrls: ch.rpcUrls,
+        rpcUrls: ["https://chain-rpc.litprotocol.com/http"],
         chainName: ch.name,
         nativeCurrency: {
           name: ch.symbol,
-          symbol: (ch.symbol == 'testLPX') ? 'LIT' : ch.symbol,
+          symbol: "LIT",
           decimals: ch.decimals
         },
         blockExplorerUrls: ch.blockExplorerUrls
@@ -146,7 +146,7 @@ logs("violet",`Sending Tx ${i+1}...`)
    
   } catch (e) {
     console.error(e);
-   logs("red","Something went wrong."+e.message)
+   logs("red","Something went wrong. "+e.message)
   } finally {
     disconnectWeb3();
   }
@@ -175,6 +175,7 @@ async function getLitNodeClient() {
 }
 
 async function mintPkp() {
+  log = "";
   try {
   logs("violet","Minting new PKP...");
   const pkp = (await litContractClient.pkpNftContractUtils.write.mint()).pkp;
@@ -255,7 +256,7 @@ async function idPkp() {
       newKey = await litContractClient.pkpNftContract.read.getPubkey(id);
     } else {newKey = id}
    
-      refresh(newKey)
+      setTimeout(refresh,1000,newKey)
   
  } catch (error) {
     console.error(error);
