@@ -1,7 +1,16 @@
 body {
     text-align: center;
     margin: 50px;
-    
+    background-image: url("bg.webp");
+    opacity: 0.85;
+}
+
+body, button, textarea, input, pre {
+    font-family: "Teko", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 19px;
 }
 
 #log {
@@ -9,16 +18,20 @@ body {
    color:aqua;
    padding:10px;
    overflow-x:hidden; 
+   font-weight: 300;
+   max-width: 900px;
+   margin: auto;
+   
+   
 }
 
-
-#pkpaddr, #acc, #bal, #pkppub {
-    
+#pkpaddr, #acc, #bal, #pkppub { 
     color: blueviolet
 }
 
 textarea {
     width: 100%;
+    max-width: 900px;
 }
 
 a {
