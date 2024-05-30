@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "Example of combining and sending transactions using a Lit Action",
   "source": "src/index.html",
-  "license": "MIT",
 "scripts": {
-  "start": "parcel"
+  "start": "parcel src/index.html"
 },
   "dependencies": {
     "@lit-protocol/auth-browser": "^6.0.0-beta.4",
