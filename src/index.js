@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("idButton").addEventListener("click", idPkp);
 });
 
-var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,nfts,sessionSigs,litNodeClient;
+var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,sessionSigs,litNodeClient;
 
 connect()
 
@@ -61,12 +61,12 @@ async function connect() {
     const balance = await provider.getBalance(account);
     balanceInLit = ethers.utils.formatEther(balance);
     document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
-    logs("aqua","Fetching PKP...")
+    logs("violet","Fetching PKP...")
     litContractClient = await getLitContractClient(ethersSigner);
-    const data = await getPkpPublicKey(0,account,"");
-    if (data != "") {
-    pkpPubkey = data.key
-    pkpAddress = data.addr;
+    const ids = await scanPkp(1,account);
+    if (ids.length) {
+    pkpPubkey = ids[0].key
+    pkpAddress = ids[0].addr;
     document.getElementById('pkpaddr').innerHTML = pkpAddress;
     document.getElementById('pkppub').innerHTML = pkpPubkey;
     logs("lime","Ready!")
@@ -98,7 +98,7 @@ try {
 
    if (!sessionSigs) {
     sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
-    logs("violet","Got Session Signatures!");
+    logs("lime","Got Session Signatures!");
    }
 
    
@@ -112,7 +112,7 @@ try {
 
    for (let i = 0; i < txs.length; i++)  {
     try {
-logs("aqua",`Sending Tx ${i+1}...`)
+logs("violet",`Sending Tx ${i+1}...`)
     const workChain = LIT_CHAINS[txs[i].chain];
     console.log( workChain)
     const rpc = `${LIT_CHAINS[txs[i].chain].rpcUrls[0]}`;
@@ -121,7 +121,7 @@ logs("aqua",`Sending Tx ${i+1}...`)
     const nonce = await workProvider.getTransactionCount(pkpAddress);
     const value = ethers.utils.parseUnits(txs[i].value,"ether")
     const bal = await workProvider.getBalance(pkpAddress);
-    if (value >= bal) {logs("orange",`The balance of PKP address is to low on ${workChain.name}`);
+    if (value >= bal) {logs("orange",`The balance ${pkpAddress} is ${ethers.utils.formatEther(bal)} too low on ${workChain.name}`);
   continue
   }
 
@@ -160,7 +160,7 @@ logs("aqua",`Sending Tx ${i+1}...`)
    logs("lime",`Success! TxHash ${i+1}: <a href="${workChain.blockExplorerUrls[0]}tx/${tx.hash}" target="_blank">${tx.hash}</a>`); 
   } catch(e) {
     console.error(e);
-    logs("red","Something went wrong."+e.message);
+    logs("red","Something went wrong. "+e.message);
     continue
 }
     }
@@ -194,29 +194,31 @@ async function getLitNodeClient() {
   logs("violet","Connecting Lit Client to network...");
   await litNodeClient.connect();
 
-  logs("violet","Lit Client connected!");
+  logs("lime","Lit Client connected!");
   return litNodeClient;
 }
 
-async function getPkpPublicKey(i,account,id) {
-  if (!nfts) nfts = await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`);
-  if (!nfts.data.data.length) { 
-   logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
-    if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
-   return ""
-  }
-  const tokenId = (id) ? id : nfts.data.data[i].tokenID;
-  const pkp = await litContractClient.pkpNftContract.read.getPubkey(tokenId);
-  return {id:tokenId, key: pkp, addr: ethers.utils.computeAddress(pkp)};
+async function getPkpPublicKey(account) {
+ //const ids = await scanpkp(account);
+  //if (!nfts) nfts = await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`);
+  //if (!nfts.data.data.length) { 
+  // logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
+   // if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
+  // return ""
+  //}
+  //const tokenId = (id) ? id : nfts.data.data[i].tokenID;
+  //const pkp = await litContractClient.pkpNftContract.read.getPubkey(tokenId);
+ // return {id:tokenId, key: pkp, addr: ethers.utils.computeAddress(pkp)};
 }
 
 
 async function mintPkp() {
   try {
-  logs("aqua","Minting new PKP...");
-  await litContractClient.pkpNftContractUtils.write.mint();
-  logs("aqua","Waiting for transaction about 15 sec...")
-  setTimeout(connect, 15000);
+  logs("violet","Minting new PKP...");
+  const pkp = (await litContractClient.pkpNftContractUtils.write.mint()).pkp;
+  console.log(pkp);
+logs("aqua",`Address: <b>${pkp.ethAddress}</b><br>PubKey: 0x${pkp.publicKey}<br>NFTID: ${pkp.tokenId}`)
+  refresh("0x"+pkp.publicKey)
   }
  catch (error) {
   console.error(error);
@@ -283,20 +285,72 @@ function logs(c,t){
 } 
 
 async function viewPkp() {
-  for (var i=0; i < nfts.data.data.length; i++) {
-    const data = await getPkpPublicKey(i,account);
-    if (data) logs("aqua",`TokenID: ${data.id} Address: ${data.addr}`)
+  log = "";
+  logs("violet", "Scanning account for PKP...")
+  const ids = await scanPkp(100,account)
+  for (var i=0; i < ids.length; i++) {
+    logs("aqua",`Address: <b>${ids[i].addr}</b><br>PubKey: ${ids[i].key}<br>NFTID: ${ids[i].id}`)
   }
   logs("lime","Complited!")
 }
 
+//function getRandomColor() {
+//	var x = Math.round(Math.random()*(0xffffff - 0x111111) + 0x111111).toString(16);
+//	return '#' + x
+//}
+
 async function idPkp() {
-  const data = await getPkpPublicKey(0,account,document.getElementById("id").value);
-  if (data) {pkpPubkey = data.key; pkpAddress = data.addr;
-    document.getElementById('pkpaddr').innerHTML = pkpAddress;
-    document.getElementById('pkppub').innerHTML = pkpPubkey;
+  log = "";
+  try {
+    logs("violet", "Importing PKP wallet...")
+    const id = document.getElementById("id").value.trim();
+    var newKey = "";
+     if (id.length == 42) { //address
+      const ids = await scanPkp(100,account)
+      for (let obj of ids) {
+        if (obj.addr == id) {newKey = obj.key; break} 
+      }
+    } else if (id.length < 132) {//nft id
+      newKey = await litContractClient.pkpNftContract.read.getPubkey(id);
+    } else {newKey = id}
+   
+      refresh(newKey)
+  
+ } catch (error) {
+    console.error(error);
+    logs("orange","PKP not found.")
   }
-  logs("lime","Complited!")
+}
+
+function refresh(newKey) {
+  try {
+    pkpAddress = ethers.utils.computeAddress(newKey);
+    pkpPubkey = newKey;
+    document.getElementById('pkppub').innerHTML = pkpPubkey;
+    document.getElementById('pkpaddr').innerHTML = pkpAddress;
+    logs("lime","Complited!")
+  } catch (error) {
+    console.error(error);
+    logs("orange","PKP not found.")
+  }
+    
+}
+
+async function scanPkp(le,account) {
+  const nfts = (await axios.get(`https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=cayenne`)).data.data;
+  var ids = [];
+  if (!nfts.length) { 
+   logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
+    if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
+  
+  } else {
+  for (var i = 0; (i < nfts.length && i < le); i++ ) {
+  let id = nfts[i].tokenID
+  let pkp = await litContractClient.pkpNftContract.read.getPubkey(id);
+   ids.push({id:id, key: pkp, addr: ethers.utils.computeAddress(pkp)})
+  }
+}
+  return ids;
 }
 
 //22643394743381587667658748339099971610029222951739902768542770658957559298368 

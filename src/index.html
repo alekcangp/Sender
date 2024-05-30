@@ -10,11 +10,11 @@
   <body>
     Network: <span style="color:green">Cayene</span>
     <br>
-    <a href="https://developer.litprotocol.com/v3/resources/supported-chains">Supported chains</a>
+    <a href="https://developer.litprotocol.com/v3/resources/supported-chains" target="_blank">Supported chains</a>
     <br>
-    <a href="https://faucet.litprotocol.com/">Lit faucet</a>
+    <a href="https://faucet.litprotocol.com/" target="_blank">Lit faucet</a>
     <br>
-    <a href="https://developer.litprotocol.com/v2/pkp/intro">What's PKP</a>
+    <a href="https://developer.litprotocol.com/v2/pkp/intro" target="_blank">What's PKP</a>
     <h3>Create, programm and send transactions using <a href="https://developer.litprotocol.com/v2/litactions/intro">Lit Action</a></h3>
 
     <!--
@@ -35,13 +35,13 @@
       PKP Public Key: <span id="pkppub">...</span>
         <br><br>
          Transactions:<br><br>
-          <textarea placeholder='For example:{"chain":"chronicleTestnet","address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"chronicleTestnet","address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000002"}' rows="8" title="Past the transaction obects separated by commas." id="txs"></textarea>
+          <textarea placeholder='For example:{"chain":"ethereum", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.0001"},{"chain":"baseSepolia", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"chronicleTestnet", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.0000001"}' rows="8" title="Past the transaction obects separated by commas." id="txs"></textarea>
      <br>
      <br>
     <button id="startButton"><b>Combine&Send</b></button>
     <br><br>
 Console:<br><br>
-<button id="mintButton">Mint new PKP</button> <button id="viewButton">View PKPs</button> <button id="idButton">PKP from</button><input type="text" id="id" required minlength="4" maxlength="100" size="50" placeholder="TokenID"/>
+<button id="mintButton">Mint new PKP</button> <button id="viewButton">Scan PKPs</button> <button id="idButton">Import PKP from</button><input type="text" id="id" required minlength="42" maxlength="132" size="50" placeholder="NFTID, PKP Address or Public Key"/>
     <pre id="log"></pre>
     <script src="./index.js"></script>
   </body>
