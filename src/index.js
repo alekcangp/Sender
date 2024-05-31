@@ -26,6 +26,13 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("idButton").addEventListener("click", idPkp);
 });
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("test").addEventListener("click", test);
+});
+
+function test() {
+  document.getElementById("txs").value = '{"chain":"ethereum", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"baseSepolia", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000002"},{"chain":"chronicleTestnet", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000003"}'
+}
 
 var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,sessionSigs,litNodeClient;
 
@@ -33,7 +40,7 @@ connect()
 
 async function connect() {
   try{
-  logs("violet","Connecting...");
+  logs("violet","Connecting to MetaMask...");
   const ch = LIT_CHAINS['chronicleTestnet'];
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
@@ -67,8 +74,8 @@ async function connect() {
     pkpAddress = ids[0].addr;
     document.getElementById('pkpaddr').innerHTML = pkpAddress;
     document.getElementById('pkppub').innerHTML = pkpPubkey;
-    logs("lime","Ready!")
-    } else {logs("lime","Complited!")}
+    logs("lime","Got PKP!")
+    } else {logs("lime","PKP not found for this account!")}
 
   } catch (error) {
     console.error(error);
@@ -91,23 +98,25 @@ try {
    const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
    for (let i = 0; i < txs.length; i++)  {
     try {
-logs("violet",`Sending Tx ${i+1}...`)
+    
     const workChain = LIT_CHAINS[txs[i].chain];
-    console.log( workChain)
+    logs("violet",`Sending ${txs[i].value} to ${txs[i].address} on ${workChain.name}...`)
     const rpc = `${LIT_CHAINS[txs[i].chain].rpcUrls[0]}`;
     const workProvider = new ethers.providers.JsonRpcProvider(rpc);
+    const gasLimit = "0x5208";//
     const gasPrice = await workProvider.getGasPrice();
     const nonce = await workProvider.getTransactionCount(pkpAddress);
-    const value = ethers.utils.parseUnits(txs[i].value,"ether")
+    const value = ethers.utils.parseUnits(txs[i].value,"ether");
     const bal = await workProvider.getBalance(pkpAddress);
-    if (value >= bal) {logs("orange",`The balance ${pkpAddress} is ${ethers.utils.formatEther(bal)} too low on ${workChain.name}`);
-  continue
+    if ((ethers.BigNumber.from(value).add(ethers.BigNumber.from(gasPrice).mul(ethers.BigNumber.from(gasLimit)))).gt(ethers.BigNumber.from(bal))) {
+      logs("orange",`The balance ${pkpAddress} is ${ethers.utils.formatEther(bal)} too low.`);
+      continue
   }
 
     const txParams = {
-      nonce: await workProvider.getTransactionCount(pkpAddress),
-      gasPrice: await workProvider.getGasPrice(),
-      gasLimit: ethers.utils.parseUnits("21000","wei"),
+      nonce: nonce,
+      gasPrice: gasPrice,
+      gasLimit: gasLimit,
       to: txs[i].address,
       value: value,
       chainId: workChain.chainId,
@@ -192,7 +201,8 @@ logs("aqua",`Address: <b>${pkp.ethAddress}</b><br>PubKey: 0x${pkp.publicKey}<br>
 async function getSessionSigs(litNodeClient, ethersSigner) {
   logs("violet","Getting Session Signatures...");
   return litNodeClient.getSessionSigs({
-    chain: "ethereum",
+    chain: "chronicleTestnet",
+    uri: "qqqq",
     expiration: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // 24 hours
     resourceAbilityRequests: [
       {
@@ -270,7 +280,7 @@ function refresh(newKey) {
     pkpPubkey = newKey;
     document.getElementById('pkppub').innerHTML = pkpPubkey;
     document.getElementById('pkpaddr').innerHTML = pkpAddress;
-    logs("lime","Complited!")
+    logs("lime","Got PKP wallet!")
   } catch (error) {
     console.error(error);
     logs("orange","PKP not found.")
