@@ -14,7 +14,7 @@ body, button, textarea, input, pre {
 }
 
 #log {
-   background:black;
+   background:darkblue;
    color:aqua;
    padding:10px;
    overflow-x:hidden; 
