@@ -75,7 +75,7 @@ async function connect() {
     document.getElementById('pkpaddr').innerHTML = pkpAddress;
     document.getElementById('pkppub').innerHTML = pkpPubkey;
     logs("lime","Got PKP!")
-    } else {logs("lime","PKP not found for this account!")}
+    } //else {logs("lime","PKP not found for this account!")}
 
   } catch (error) {
     console.error(error);
@@ -89,6 +89,8 @@ async function startClick() {
   log = "";  
 try {
 
+    if (pkpPubkey == undefined) {logs("orange", "PKP is required to send transactions."); return}
+
    if (!litNodeClient)  litNodeClient = await getLitNodeClient();
    if (!sessionSigs) {
     sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
@@ -96,6 +98,9 @@ try {
    }
 
    const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
+
+   if (txs.length < 1) {logs("orange","Transactions not found. Paste transactions into textarea or hit 'test' button."); return}
+
    for (let i = 0; i < txs.length; i++)  {
     try {
     
