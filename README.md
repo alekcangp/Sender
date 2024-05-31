@@ -1,6 +1,6 @@
 ## Sender
 
-Simple tool based on <a href="https://www.litprotocol.com/">Lit Protocol</a> to programm multichains transactions using <a href="https://developer.litprotocol.com/v2/pkp/intro">Programmable Key Pair</a> (PKP)
+Simple tool based on <a href="https://www.litprotocol.com/">Lit Protocol</a> to program multichain transactions using <a href="https://developer.litprotocol.com/v2/pkp/intro">Programmable Key Pair</a> (PKP)
 
 ### Features
 
