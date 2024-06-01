@@ -36,6 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("networks").addEventListener("change", connect);
 });
 
+window.ethereum.on('accountsChanged', function (accounts) {
+  disconnectWeb3();
+  sessionSigs = "";
+  connect()
+});
+
+
 function test() {
   document.getElementById("txs").value = '{"chain":"ethereum", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000001"},{"chain":"baseSepolia", "address":"0x8cFc0e8C1f8DFb3335e00de92D9Cb6556f841C04","value":"0.000002"},{"chain":"chronicleTestnet", "address":"0xA1485801Ea9d4c890BC7563Ca92d90c4ae52eC75","value":"0.000003"}'
 }
@@ -67,21 +74,20 @@ async function connect() {
       }]
     });
 
-    provider = new ethers.providers.Web3Provider(window.ethereum);
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     await provider.send("eth_requestAccounts", []);
     ethersSigner = provider.getSigner();
     account = await ethersSigner.getAddress();
     logs("aqua","Connected account: " + account);
     document.getElementById('acc').innerHTML = account;
 
+    
     const balance = await provider.getBalance(account);
     balanceInLit = ethers.utils.formatEther(balance);
     document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
 
     litNodeClient = await getLitNodeClient();
 
-    sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
-    logs("lime","Got Session Signatures!");
 
     logs("violet","Fetching PKP. . .")
     litContractClient = await getLitContractClient(ethersSigner);
@@ -104,13 +110,17 @@ async function connect() {
 
 async function startClick() {
   log = "";  
+ 
 try {
-
+  
     if (pkpPubkey == undefined) {logs("orange", "PKP is required to send transactions."); return}
 
    const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
 
    if (txs.length < 1) {logs("orange","Transactions not found. Paste transactions into textarea or hit 'test' button."); return}
+
+    if(!sessionSigs) {sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
+    logs("lime","Got Session Signatures!");}
 
    for (let i = 0; i < txs.length; i++)  {
     try {
