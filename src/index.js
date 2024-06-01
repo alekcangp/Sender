@@ -109,8 +109,11 @@ async function startClick() {
 try {
   
   if (pkpPubkey == undefined) {logs("orange", "PKP is required to send transactions."); return}
-  const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
-  if (txs.length < 1) {logs("orange","Transactions not found. Paste transactions into textarea or hit 'test' button."); return}
+  
+  
+  const txs = JSON.parse(`[${document.getElementById('txs').value}]`);
+  
+  if (!txs[0].chain || !txs[0].value || !txs[0].address) {throw new Error('JSON')}
 
   if(!litNodeClient) {  litNodeClient = await getLitNodeClient();}
   if(!sessionSigs) {sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
@@ -179,7 +182,8 @@ try {
    
   } catch (e) {
     console.error(e);
-   logs("red","Something went wrong. "+e.message)
+    if (e.message.includes('JSON') || e.message.includes('properties') ) logs("orange","Transactions are not correct. Check transactions into the textarea or hit 'test' button.")
+      else logs("red","Something went wrong... "+e.message)
   } 
 }
 
@@ -338,11 +342,12 @@ function refresh(newKey) {
     logs("lime","Got PKP wallet!")
   } catch (error) {
     console.error(error);
+    //pkpAddress = ""
+    //pkpPubkey = "";
+    //document.getElementById('pkppub').innerHTML = pkpPubkey;
+    //document.getElementById('pkpaddr').innerHTML = pkpAddress; 
     logs("orange","PKP not found.")
-    pkpAddress = ""
-    pkpPubkey = "";
-    document.getElementById('pkppub').innerHTML = pkpPubkey;
-    document.getElementById('pkpaddr').innerHTML = pkpAddress;
+    
   }
 }
 
