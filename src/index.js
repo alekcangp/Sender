@@ -165,7 +165,7 @@ try {
 
    const signedTx = ethers.utils.serializeTransaction(txParams, litActionSignatures.signatures[`sig${i}`].signature);
    const tx = await workProvider.sendTransaction(signedTx);
-   const blockExp = workChain.blockExplorerUrls[0];
+   var blockExp = workChain.blockExplorerUrls[0];
    if (blockExp[blockExp.length - 1] != '/') blockExp = blockExp + '/'
    logs("lime",`Success! TxHash ${i+1}: <a href="${blockExp}tx/${tx.hash}" target="_blank">${tx.hash}</a>`); 
 
