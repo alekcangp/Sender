@@ -5,7 +5,7 @@ body {
     opacity: 0.85;
 }
 
-body, button, textarea, input, pre {
+body, button, textarea, input, pre, select {
     font-family: "Teko", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -36,4 +36,9 @@ textarea {
 
 a {
     color:Teal
+}
+
+select {
+    color:green;
+
 }

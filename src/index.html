@@ -11,14 +11,19 @@
     <title>Sender</title>
   </head>
   <body>
-    Network: <span style="color:green">Cayene</span>
-    <br>
-    <a href="https://developer.litprotocol.com/v3/resources/supported-chains" target="_blank">Supported chains</a>
-    <br>
-    <a href="https://faucet.litprotocol.com/" target="_blank">Faucet</a>
-    <br>
-    <a href="https://developer.litprotocol.com/v2/pkp/intro" target="_blank">What's PKP</a>
-    <h3>Create, program and send transactions using <a href="https://www.litprotocol.com/" target="_blank">Lit Protocol</a></h3>
+     <a href="https://developer.litprotocol.com/v3/resources/supported-chains" target="_blank">Supported chains</a> | <a href="https://faucet.litprotocol.com/" target="_blank">Faucet</a> | <a href="https://developer.litprotocol.com/v2/pkp/intro" target="_blank">What's PKP</a>
+     | <a href="https://developer.litprotocol.com/v3/sdk/capacity-credits" target="_blank">What's Credits</a>
+      <br><br>
+    Network: 
+    <select id="networks">
+      <option value="Cayenne">Cayenne</option>
+       <option value="Manzano">Manzano</option>
+      <option value="Habanero">Habanero</option>
+    </select>
+    
+   
+   
+     <h3>Create, program and send transactions using <a href="https://www.litprotocol.com/" target="_blank">Lit Protocol</a></h3>
 
     <!--
     Create <a href="https://developer.litprotocol.com/learninglab/intro-to-lit/prog-signing#programmable-key-pairs">PKP</a>
@@ -44,7 +49,7 @@
     <button id="startButton"><b>Combine&Send</b></button>
     <br><br>
 Console:<br>
-<button id="mintButton">Mint new PKP</button> <button id="viewButton">Scan PKPs</button> <button id="idButton">Import PKP from</button><input type="text" id="id" required maxlength="132" style="width: 300px;" placeholder="NFTID, PKP Address or Public Key"/>
+<button id="mintButton">Mint new PKP</button>  <button id="mintCredits">Mint Credits</button> <button id="viewButton">Scan PKPs</button> <button id="idButton">Import PKP from</button><input type="text" id="id" required maxlength="132" style="width: 300px;" placeholder="NFTID, PKP Address or Public Key"/>
     <br><br>
 <pre id="log"></pre>
     <script src="./index.js"></script>
