@@ -37,8 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.ethereum.on('accountsChanged', function (accounts) {
-  disconnectWeb3();
-  sessionSigs = "";
   connect()
 });
 
@@ -50,11 +48,14 @@ function test() {
 var log = "", provider,ethersSigner,litContractClient,pkpPubkey,balanceInLit,account,pkpAddress,sessionSigs,litNodeClient,network;
 var expUrl = 'https://chain.litprotocol.com/tx/';
 
-disconnectWeb3();
+
 connect()
 
 async function connect() {
   log = "";
+  disconnectWeb3();
+  litNodeClient = "";
+  sessionSigs = "";
   try{
   network = document.getElementById("networks").value;
   logs("violet","Connecting to MetaMask. . .");
@@ -83,9 +84,6 @@ async function connect() {
 
     checkBal();
 
-    litNodeClient = await getLitNodeClient();
-
-
     logs("violet","Fetching PKP. . .")
     litContractClient = await getLitContractClient(ethersSigner);
     const ids = await scanPkp(1,account);
@@ -110,13 +108,13 @@ async function startClick() {
  
 try {
   
-    if (pkpPubkey == undefined) {logs("orange", "PKP is required to send transactions."); return}
+  if (pkpPubkey == undefined) {logs("orange", "PKP is required to send transactions."); return}
+  const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
+  if (txs.length < 1) {logs("orange","Transactions not found. Paste transactions into textarea or hit 'test' button."); return}
 
-   const txs = JSON.parse(`[${document.getElementById('txs').value}]`); 
-
-   if (txs.length < 1) {logs("orange","Transactions not found. Paste transactions into textarea or hit 'test' button."); return}
-
-    if(!sessionSigs) {sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
+  if(!litNodeClient) {  litNodeClient = await getLitNodeClient();}
+  if(!sessionSigs) {sessionSigs = await getSessionSigs(litNodeClient, ethersSigner);
+    
     logs("lime","Got Session Signatures!");}
 
    for (let i = 0; i < txs.length; i++)  {
@@ -327,7 +325,7 @@ async function idPkp() {
  } catch (error) {
     console.error(error);
     //logs("orange","PKP not found.")
-    refresh("")
+    setTimeout(refresh,1000,"")
   }
 }
 
