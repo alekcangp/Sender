@@ -81,10 +81,7 @@ async function connect() {
     logs("aqua","Connected account: " + account);
     document.getElementById('acc').innerHTML = account;
 
-    
-    const balance = await provider.getBalance(account);
-    balanceInLit = ethers.utils.formatEther(balance);
-    document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
+    checkBal();
 
     litNodeClient = await getLitNodeClient();
 
@@ -206,7 +203,8 @@ async function getLitNodeClient() {
   const litNodeClient = new LitNodeClient({
     litNetwork: LitNetwork[network]
   });
-  logs("violet",`Connecting Lit Client to <b>${network}</b> network. . .`);
+  setTimeout(logs,500,"violet",`Connecting Lit Client to <b>${network}</b> network. . .`)
+  //logs("violet",`Connecting Lit Client to <b>${network}</b> network. . .`);
   await litNodeClient.connect();
   logs("lime","Lit Client connected!");
   return litNodeClient;
@@ -220,17 +218,21 @@ async function mintPkp() {
   console.log(pkp);
 logs("aqua",`Address: <b>${pkp.pkp.ethAddress}</b><br>PubKey: 0x${pkp.pkp.publicKey}<br>NFTID: ${pkp.pkp.tokenId}<br>TxHash: <a href="${expUrl}${pkp.tx.hash}" target="_blank">${pkp.tx.hash}</a>`)
   refresh("0x"+pkp.pkp.publicKey)
+  
   }
  catch (error) {
   console.error(error);
-  logs("red",error.message)
+  //logs("red", error.message)
+  
+} finally {
+  checkBal()
 }
 }
 
 async function mintCredits() {
   log = "";
   logs("violet","Minting a Capacity Credit NFT. . .")
-  try {
+    try {
   const capacity = await litContractClient.mintCapacityCreditsNFT({
     requestsPerKilosecond: 100,
      //requestsPerDay: ,
@@ -239,9 +241,13 @@ async function mintCredits() {
   });
 
   logs("lime",`Minted Capacity Credits for 30 days and 100 requests per kiloseconds.<br>TxHash: <a href="${expUrl}${capacity.rliTxHash}" target="_blank">${capacity.rliTxHash}</a>`)
+  
   } catch(e) {
     console.error(e);
-    logs("red",e.message)
+    //logs("red", e.message)
+    
+  } finally {
+    checkBal()
   }
 }
 
@@ -298,7 +304,7 @@ async function viewPkp() {
   for (var i=0; i < ids.length; i++) {
     logs("aqua",`Address: <b>${ids[i].addr}</b><br>PubKey: ${ids[i].key}<br>NFTID: ${ids[i].id}`)
   }
-  logs("lime","Complited!")
+ // logs("lime","Complited!")
 }
 
 async function idPkp() {
@@ -320,7 +326,7 @@ async function idPkp() {
   
  } catch (error) {
     console.error(error);
-    logs("orange","PKP not found.")
+    //logs("orange","PKP not found.")
     refresh("")
   }
 }
@@ -348,7 +354,7 @@ async function scanPkp(le,account) {
   if (!nfts.length) { 
     refresh("");
    logs('orange', "Hit button 'Mint new PKP'")
-    if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
+   //checkBal()
   
   } else {
   for (var i = 0; (i < nfts.length && i < le); i++ ) {
@@ -358,4 +364,11 @@ async function scanPkp(le,account) {
   }
 }
   return ids;
+}
+
+async function checkBal() {
+  const balance = await provider.getBalance(account);
+    balanceInLit = ethers.utils.formatEther(balance);
+    document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
+  if (balanceInLit < 0.000001) logs("orange", `Balance is ${balanceInLit} too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>`)
 }
