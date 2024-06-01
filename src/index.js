@@ -321,6 +321,7 @@ async function idPkp() {
  } catch (error) {
     console.error(error);
     logs("orange","PKP not found.")
+    refresh("")
   }
 }
 
@@ -334,6 +335,10 @@ function refresh(newKey) {
   } catch (error) {
     console.error(error);
     logs("orange","PKP not found.")
+    pkpAddress = ""
+    pkpPubkey = "";
+    document.getElementById('pkppub').innerHTML = pkpPubkey;
+    document.getElementById('pkpaddr').innerHTML = pkpAddress;
   }
 }
 
@@ -341,7 +346,8 @@ async function scanPkp(le,account) {
   const nfts = (await axios.get(`https://api.codetabs.com/v1/proxy?quest=https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=${network.toLowerCase()}`)).data.data;
   var ids = [];
   if (!nfts.length) { 
-   logs('orange', "PKP not found for this account. Hit button 'Mint new PKP'")
+    refresh("");
+   logs('orange', "Hit button 'Mint new PKP'")
     if (balanceInLit < 0.000001) logs("orange", "Balance is too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>")
   
   } else {
