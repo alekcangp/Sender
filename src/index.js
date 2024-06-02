@@ -82,18 +82,35 @@ async function connect() {
     logs("aqua","Connected account: " + account);
     document.getElementById('acc').innerHTML = account;
 
-    checkBal();
+
+    //balanceInLit = ethers.constants.Zero
+    provider.on('block', () => {
+        provider.getBalance(account).then((balance) => {
+          //  if (!balance.eq(balanceInLit)) {
+            //  balanceInLit = balance
+              balanceInLit = ethers.utils.formatEther(balance)
+              document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
+              console.log(`balance: ${balanceInLit} ETH`)
+           // }
+        })
+    })
 
     logs("violet","Fetching PKP. . .")
     litContractClient = await getLitContractClient(ethersSigner);
     const ids = await scanPkp(1,account);
     if (ids.length) {
-    pkpPubkey = ids[0].key
-    pkpAddress = ids[0].addr;
-    document.getElementById('pkpaddr').innerHTML = pkpAddress;
-    document.getElementById('pkppub').innerHTML = pkpPubkey;
-    logs("lime","Got PKP!")
-    } //else {logs("lime","PKP not found for this account!")}
+      pkpPubkey = ids[0].key
+      pkpAddress = ids[0].addr;
+      document.getElementById('pkpaddr').innerHTML = pkpAddress;
+      document.getElementById('pkppub').innerHTML = pkpPubkey;
+      logs("lime","Got PKP!")
+    } else {
+      pkpAddress = ""
+      pkpPubkey = "";
+      document.getElementById('pkppub').innerHTML = pkpPubkey;
+      document.getElementById('pkpaddr').innerHTML = pkpAddress; 
+      //logs("lime","PKP not found for this account!")
+    }
 
   } catch (error) {
     console.error(error);
@@ -342,10 +359,6 @@ function refresh(newKey) {
     logs("lime","Got PKP wallet!")
   } catch (error) {
     console.error(error);
-    //pkpAddress = ""
-    //pkpPubkey = "";
-    //document.getElementById('pkppub').innerHTML = pkpPubkey;
-    //document.getElementById('pkpaddr').innerHTML = pkpAddress; 
     logs("orange","PKP not found.")
     
   }
@@ -355,9 +368,8 @@ async function scanPkp(le,account) {
   const nfts = (await axios.get(`https://api.codetabs.com/v1/proxy?quest=https://explorer.litprotocol.com/api/get-pkps-by-address/${account}?network=${network.toLowerCase()}`)).data.data;
   var ids = [];
   if (!nfts.length) { 
-    refresh("");
+   refresh("");
    logs('orange', "Hit button 'Mint new PKP'")
-   //checkBal()
   
   } else {
   for (var i = 0; (i < nfts.length && i < le); i++ ) {
@@ -370,8 +382,5 @@ async function scanPkp(le,account) {
 }
 
 async function checkBal() {
-  const balance = await provider.getBalance(account);
-    balanceInLit = ethers.utils.formatEther(balance);
-    document.getElementById('bal').innerHTML = `${balanceInLit} LIT`;
   if (balanceInLit < 0.000001) logs("orange", `Balance is ${balanceInLit} too low. Get testnet LIT <a href='https://faucet.litprotocol.com/' target='_blank'>Faucet</a>`)
 }
